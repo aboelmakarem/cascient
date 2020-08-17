@@ -178,12 +178,13 @@ namespace Cascient
 		}
 		// allocate and initialize output and weight arrays
 		biases = new double[kernel_count];
-		weights = new double[kernel_count*kernel_width*kernel_height];
+		weights = new double[kernel_count*kernel_width*kernel_height*input_depth];
 		activation_output = new double[activation_output_width*activation_output_height*output_depth];
 		output = new double[pooling_output_width*pooling_output_height*output_depth];
 		memset(activation_output,0,activation_output_width*activation_output_height*output_depth*sizeof(double));
 		memset(output,0,pooling_output_width*pooling_output_height*output_depth*sizeof(double));
-		unsigned int kernel_size = kernel_width*kernel_height;
+		unsigned int kernel_channel_size = kernel_width*kernel_height;
+		unsigned int kernel_size = kernel_channel_size*input_depth;
 		for(unsigned int k = 0 ; k < kernel_count ; k++)
 		{
 			biases[k] = EZ::Random::Uniform();
@@ -191,7 +192,10 @@ namespace Cascient
 			{
 				for(unsigned int i = 0 ; i < kernel_width ; i++)
 				{
-					weights[k*kernel_size + j*kernel_width + i] = EZ::Random::Uniform();
+					for(unsigned int l = 0 ; l < input_depth ; l++)
+					{
+						weights[k*kernel_size + j*kernel_channel_size + i*input_depth + l] = EZ::Random::Uniform();
+					}
 				}
 			}
 		}
@@ -201,7 +205,8 @@ namespace Cascient
 		// pass the inputs through the convolution process and apply the activations 
 		// on the convolution output 
 		// all kernel dimensions are assumed to be odd numbers
-		unsigned int kernel_size = kernel_width*kernel_height;
+		unsigned int kernel_channel_size = kernel_width*kernel_height;
+		unsigned int kernel_size = kernel_channel_size*input_depth;
 		unsigned int input_channel_size = input_width*input_height;
 		unsigned int activation_channel_size = activation_output_width*activation_output_height;
 		unsigned int input_i = 0;
@@ -224,7 +229,7 @@ namespace Cascient
 						for(unsigned int p = 0 ; p < kernel_height ; p++)
 						{
 							convolution += EZ::Math::BLAS::DotProduct(kernel_width,1,
-									&weights[k*kernel_size + p*kernel_width],
+									&weights[k*kernel_size + c*kernel_channel_size + p*kernel_width],
 									1,&input[c*input_channel_size + (input_j + p)*input_width + input_i]);
 						}
 					}
@@ -240,7 +245,7 @@ namespace Cascient
 					{
 						// Sigmoid activation
 						activation_output[k*activation_channel_size + j*activation_output_width + i] = 1.0/(1.0 + exp(-activation_input));
-					}					
+					}			
 				}
 			}
 		}
