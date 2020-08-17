@@ -37,6 +37,61 @@ namespace Cascient
 		output = 0;
 	}
 
+	FFBlock::FFBlock(){Initialize();}
+	FFBlock::FFBlock(const FFBlock& block) : Block(block){*this = block;}
+	FFBlock::~FFBlock(){Reset();}
+	FFBlock& FFBlock::operator=(const FFBlock& block)
+	{
+		Block::operator=(block);
+		input_size = block.input_size;
+		output_size = block.output_size;
+		unit_count = block.unit_count;
+		activation = block.activation;
+		return *this;
+	}
+	void FFBlock::Reset()
+	{
+		DeallocateArrays();
+		Initialize();
+		Block::Reset();
+	}
+	BlockType FFBlock::Type() const{return FeedForwardBlock;}
+	void FFBlock::Build()
+	{
+
+	}
+	void FFBlock::Push(double* input)
+	{
+
+	}
+	void FFBlock::Pull()
+	{
+
+	}
+	unsigned int FFBlock::InputSize() const{return input_size;}
+	unsigned int FFBlock::OutputSize() const{return output_size;}
+	void FFBlock::Initialize()
+	{
+		input_size = 0;
+		output_size = 0;
+		unit_count = 0;
+		activation = 0;
+		input_gradients = 0;
+		output_gradients = 0;
+		weights = 0;
+	}
+	void FFBlock::DeallocateArrays()
+	{
+		if(input_gradients != 0)		delete [] input_gradients;
+		if(output_gradients != 0)		delete [] output_gradients;
+		if(weights != 0)				delete [] weights;
+		if(output != 0)					delete [] output;
+		input_gradients = 0;
+		output_gradients = 0;
+		weights = 0;
+		output = 0;
+	}
+
 	CVBlock::CVBlock(){Initialize();}
 	CVBlock::CVBlock(const CVBlock& block) : Block(block){*this = block;}
 	CVBlock::~CVBlock(){Reset();}
@@ -245,6 +300,7 @@ namespace Cascient
 	{
 		
 	}
+	unsigned int CVBlock::InputSize() const{return(input_width*input_height*input_depth);}
 	unsigned int CVBlock::OutputSize() const{return (pooling_output_width*pooling_output_height*output_depth);}
 	void CVBlock::Initialize()
 	{

@@ -3,7 +3,7 @@ import os
 import os.path
 import sys
 
-common_sources = ["Block.cpp"]
+common_sources = ["Block.cpp","Activation.cpp"]
 #preprocessor_sources = []
 solver_sources = ["Cascient.cpp"]
 #postprocessor_sources = []

@@ -5,6 +5,8 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
+#include "Activation.h"
+
 namespace Cascient
 {
 	enum BlockType
@@ -26,6 +28,7 @@ namespace Cascient
 		virtual void Pull() = 0;
 		void ID(const unsigned int& value);
 		unsigned int ID() const;
+		virtual unsigned int InputSize() const = 0;
 		virtual unsigned int OutputSize() const = 0;
 		const double* Output() const;
 
@@ -49,12 +52,21 @@ namespace Cascient
 		void Build();
 		void Push(double* input);
 		void Pull();
+		unsigned int InputSize() const;
 		unsigned int OutputSize() const;
 		
 	private:
 		FFBlock(const FFBlock& block);
 		FFBlock& operator=(const FFBlock& block);
 		void Initialize();
+		void DeallocateArrays();
+		unsigned int input_size;
+		unsigned int output_size;
+		unsigned int unit_count;
+		const ActivationFunction* activation;
+		double* input_gradients;
+		double* output_gradients;
+		double* weights;
 	};
 
 	class CVBlock : public Block
@@ -73,6 +85,7 @@ namespace Cascient
 		void Build();
 		void Push(double* input);
 		void Pull();
+		unsigned int InputSize() const;
 		unsigned int OutputSize() const;
 		
 	private:
